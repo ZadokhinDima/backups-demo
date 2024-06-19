@@ -1,13 +1,25 @@
 version: '3'
 services:
-  postgresql:
-    image: postgres:latest
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: books
-    volumes:
-      - ./data:/var/lib/postgresql/data
+  # postgresql:
+  #   image: postgres:13
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: books
+  #   volumes:
+  #     - ./data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  pgbackrest:
+    image: ghcr.io/muratgozel/postgresql-pgbackrest:latest
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - './pgbackrest_conf:/etc/pgbackrest'
+      - './pgbackrest_logs:/var/log/pgbackrest'
+      - './data:/var/lib/postgresql/data'
+      - './pgbackrest_backups:/var/lib/pgbackrest'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
